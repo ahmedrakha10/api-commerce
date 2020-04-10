@@ -14,3 +14,12 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+//Route::get('test',function (){
+//    $reviews = \App\Models\Review::whereIn('star',[0,6])->get();
+//    foreach ($reviews as $review){
+//       $review->star = 2;
+//       $review->save();
+//    }
+//});
