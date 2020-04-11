@@ -22,11 +22,16 @@ class ProductResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'name'     => $this->name,
-            'price'    => $this->price,
-            'stock'    => $this->stock,
-            'discount' => $this->discount,
-            'details'  => $this->details,
+            'name'        => $this->name,
+            'price'       => $this->price,
+            'stock'       => $this->stock == 0 ? 'Out of the stock' : $this->stock,
+            'discount'    => $this->discount,
+            'details'     => $this->details,
+            'total_price' => round((1 - $this->discount / 100) * $this->price, 2),
+            'rating'      => $this->reviews->count() > 0 ? round($this->reviews->avg('star'), 1) : 'No rating yet',
+            'href'        => [
+                'reviews' => route('reviews.index', $this->id)
+            ]
         ];
     }
 }
