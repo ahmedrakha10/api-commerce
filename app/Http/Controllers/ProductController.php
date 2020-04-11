@@ -3,13 +3,21 @@
 namespace App\Http\Controllers;
 
 
+use App\Http\Requests\ProductRequest;
 use App\Http\Resources\product\ProductCollection;
 use App\Http\Resources\product\ProductResource;
 use App\Models\Product;
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api')->except('index', 'show');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -34,11 +42,21 @@ class ProductController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return array
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        //
+        $product = new Product;
+        $product->name = $request->name;
+        $product->price = $request->price;
+        $product->stock = $request->stock;
+        $product->discount = $request->discount;
+        $product->details = $request->details;
+        $product->save();
+        return response([
+                            'data' => new ProductResource($product)
+                        ], Response::HTTP_CREATED);
+
     }
 
     /**
@@ -49,6 +67,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+
         return new ProductResource($product);
 
     }
@@ -73,17 +92,20 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        $product->update($request->all());
+        return response([
+                            'data' => new ProductResource($product)
+                        ], Response::HTTP_CREATED);
+
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Product $product
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+        return \response()->json([
+                                     'status'  => Response::HTTP_NO_CONTENT,
+                                     'message' => 'Product has been deleted'
+                                 ]);
     }
 }

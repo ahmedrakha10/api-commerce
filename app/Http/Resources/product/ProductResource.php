@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed discount
  * @property mixed stock
  * @property mixed details
+ * @property mixed id
  */
 class ProductResource extends JsonResource
 {
@@ -22,6 +23,7 @@ class ProductResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'id'          => $this->id,
             'name'        => $this->name,
             'price'       => $this->price,
             'stock'       => $this->stock == 0 ? 'Out of the stock' : $this->stock,
