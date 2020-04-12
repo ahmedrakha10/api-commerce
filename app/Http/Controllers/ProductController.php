@@ -1,14 +1,16 @@
-<?php
+<?php /** @noinspection ALL */
 
 namespace App\Http\Controllers;
 
 
+use App\Exceptions\ProductNotBelongToUser;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\product\ProductCollection;
 use App\Http\Resources\product\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use Auth;
 
 class ProductController extends Controller
 {
@@ -92,6 +94,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
+        $this->productUserCheck($product);
         $product->update($request->all());
         return response([
                             'data' => new ProductResource($product)
@@ -102,10 +105,19 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+       $this->productUserCheck($product);
+
         $product->delete();
         return \response()->json([
                                      'status'  => Response::HTTP_NO_CONTENT,
                                      'message' => 'Product has been deleted'
                                  ]);
+    }
+
+    public function productUserCheck($product)
+    {
+        if (Auth::id() !== $product->user_id) {
+            throw new ProductNotBelongToUser;
+        }
     }
 }
